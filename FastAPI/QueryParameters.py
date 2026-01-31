@@ -1,11 +1,14 @@
 from fastapi import FastAPI 
+from pydantic import BaseModel
+from typing import Optional
+
 
 app = FastAPI()
 
 
 @app.get("/")
 async def get():
-    return {"message" , "hello there "}
+    return {"message" : "hello there "}
 
 items = [
     {"id":1 , "name":"book" , "price":"15" , "stock": True},
@@ -19,11 +22,70 @@ items = [
 
 
 @app.get("/items")
-async def list_iterms(start : int =0 , end :int  =10, id : int =None):
-    if id:
+async def list_iterms(  start : int =0,
+                        end :int  =10,
+                        id : int = None,
+                        name : str = None):
+    if id is not None:
         item = next((item  for item in items if item["id"]==id),None)
         if item:
             return item
         else:
-            return {"message" , "item not found"}
+            return {"message":"item not found"}
+    
+    if name:
+        filtered=[]
+        for item in items:
+            if item["name"] == name:
+                filtered.append(item)
+        return filtered
+
+        
     return items[start:start + end]
+
+
+
+
+@app.get("/items/prices")
+async def sort_price(range: int = None):
+    sorted_price = sorted(items , key=lambda x: int(x["price"]) , reverse=True)
+
+    if range:
+        price_range = [item for item in sorted_price if int(item["price"]) <= range]
+        return price_range
+    return sorted_price
+
+
+
+@app.get("/items/stock")
+async def get_stock(in_stock: bool = True):
+    if not in_stock:
+        item = [item for item in items if item["stock"] == False]
+        return item
+    else:
+        item = [item for item in items if item["stock"] == True]
+        return item
+
+
+
+class Item(BaseModel):
+    name : str
+    description : Optional[str] = None
+    price : float
+    tax : Optional[float] = None
+
+     
+@app.post("/items")
+async def create_item(item:Item):
+    item_dict =item.dict()
+    if item.tax:
+        price_with_tax = item.price + (item.price * item.tax)
+        item_dict.update({"total_price":price_with_tax})
+    return item_dict
+
+
+
+@app.put("/items/{item_id}")
+
+async def update_item(item_id:int , item:Item):
+    return{"item_id": item_id ,  **item.dict   }
