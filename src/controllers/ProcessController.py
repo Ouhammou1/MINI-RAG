@@ -17,7 +17,7 @@ class ProcessController(BaseController):
     def get_file_extension(self, file_id:str):
         return os.path.splitext(file_id)[-1]
     
-    def get_file_loader(self , file_id: str , file_path :str):
+    def get_file_loader(self , file_id: str ):
         file_ext = self.get_file_extension(file_id=file_id)
 
 
@@ -31,6 +31,11 @@ class ProcessController(BaseController):
         return None
     
     def get_file_content(self , file_id:str):
+        loader = self.get_file_loader(file_id=file_id )
+        return loader.load()
+    
+    def get_file_content(self, file_id: str):
+
         loader = self.get_file_loader(file_id=file_id)
         return loader.load()
 

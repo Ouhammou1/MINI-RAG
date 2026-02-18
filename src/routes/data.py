@@ -70,10 +70,26 @@ async def upload_data(
 
 @data_router.post("/process/{project_id}")
 async def process_endpoint(project_id: str , process_request :ProcessRequest):
+    
     file_id =  process_request.file_id
+    chunk_size = process_request.chunk_size
+    overlap_size = process_request.overlap_size
 
-    ProcessController = ProcessController(project_id=project_id)
+    processController = ProcessController(project_id=project_id)
 
-    file_content = ProcessController.
+    file_content = processController.get_file_content(file_id=file_id)
 
+    file_chunks = processController.process_file_content(
+        file_content=file_content,
+        file_id=file_id,
+        chunk_size=chunk_size,
+        overlap_size=overlap_size
+    )
+    if file_chunks is None or len(file_chunks) == 0:
+        return JSONResponse(
+        content=
+            {
+                "signal": ResponseSignal.PROCESSING_FAILED.value,
+            })
 
+    return file_chunks
