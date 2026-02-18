@@ -2,7 +2,7 @@ from fastapi import FastAPI, APIRouter , Depends , UploadFile , File , status
 from  fastapi.responses import JSONResponse
 import os
 from helpers.config import get_settings , Settings
-from controllers import  DataController , ProjectController
+from controllers import  DataController , ProjectController , ProcessController
 import aiofiles
 from models import ResponseSignal
 import logging
@@ -72,7 +72,8 @@ async def upload_data(
 async def process_endpoint(project_id: str , process_request :ProcessRequest):
     file_id =  process_request.file_id
 
-    return file_id
+    ProcessController = ProcessController(project_id=project_id)
 
+    file_content = ProcessController.
 
 
