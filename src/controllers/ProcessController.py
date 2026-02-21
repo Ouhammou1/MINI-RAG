@@ -31,15 +31,15 @@ class ProcessController(BaseController):
         return None
     
     def get_file_content(self , file_id:str):
-        loader = self.get_file_loader(file_id=file_id )
+        loader = self.get_file_loader(file_id=file_id)
+        if loader is None:
+            return None
         return loader.load()
     
-    def get_file_content(self, file_id: str):
-
-        loader = self.get_file_loader(file_id=file_id)
-        return loader.load()
-
     def process_file_content(self , file_content :list , file_id:str , chunk_size: int=100 , overlap_size=20):
+        if file_content is None:
+            return None
+        
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=chunk_size,
             chunk_overlap=overlap_size,
